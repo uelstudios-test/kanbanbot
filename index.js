@@ -1,4 +1,5 @@
 const Koa = require('koa');
+const Router = require('@koa/router');
 const koaBody = require('koa-body');
 const commands = require("./commands");
 const actions = require("./actions");
@@ -7,6 +8,7 @@ const CommandError = require("./CommandError");
 const github = require("./github");
 
 const app = new Koa();
+const router = new Router();
 
 // Parse request body as json
 app.use(koaBody({
@@ -14,28 +16,10 @@ app.use(koaBody({
 }));
 
 // Handle all requests
-app.use(async function (ctx) {
-    const { path, body } = ctx.request;
+router.post("/slack/command", (ctx) => {
+    const { body } = ctx.request;
 
-    // Route request to correct handler.
-    let handler;
-    switch (path) {
-        case "/slack/command":
-            handler = onCommand(ctx, body);
-            break;
-        case "/slack/action":
-            handler = onInteractiveMessage(ctx, body.payload);
-            break;
-        case "/github/webhook":
-            handler = onGitHubWebhook(ctx, body);
-            break;
-        default:
-            ctx.status = 404;
-            return;
-    }
-
-    // Generic Handle
-    return handler
+    return onCommand(ctx, body)
         .catch(error => {
             console.error(error);
             ctx.status = 500;
@@ -43,14 +27,46 @@ app.use(async function (ctx) {
         });
 });
 
+router.post("/slack/action", (ctx) => {
+    const { body } = ctx.request;
+
+    return onInteractiveMessage(ctx, body)
+        .catch(error => {
+            console.error(error);
+            ctx.status = 500;
+            ctx.body = "Internal Server Error";
+        });
+})
+
+router.post("/github/webhook", (ctx) => {
+    const { body } = ctx.request;
+
+    return onGitHubWebhook(ctx, body)
+        .catch(error => {
+            console.error(error);
+            ctx.status = 500;
+            ctx.body = "Internal Server Error";
+        });
+})
+
+app.use(router.routes());
+app.use(router.allowedMethods());
+
+
+/**
+ * 
+ * 
+ * 
+ */
+
+
 function onGitHubWebhook(ctx, payload) {
     return github.handleGithubWebhook(payload);
 }
 
 // For Actions (e.g. slack button click)
 function onInteractiveMessage(ctx, _payload) {
-    const payload = JSON.parse(_payload);
-
+    const payload = JSON.parse(_payload.payload);
     const _actions = payload.actions;
 
     switch (payload.type) {
@@ -72,7 +88,7 @@ function onInteractiveMessage(ctx, _payload) {
         }
         default: {
             ctx.status = 404;
-            return;
+            return Promise.reject();
         }
 
     }

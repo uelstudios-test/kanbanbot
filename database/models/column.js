@@ -10,6 +10,10 @@ const Column = sequelize.define(
             allowNull: false,
             unique: "unique_column_per_project"
         },
+        ghId: {
+            type: Sequelize.INTEGER,
+            allowNull: false
+        },
         limit: {
             type: Sequelize.INTEGER,
             allowNull: true

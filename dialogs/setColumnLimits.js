@@ -18,9 +18,9 @@ module.exports = async (ctx, payload) => {
         const parsed = Number.parseInt(newLimit);
 
         if (newLimit !== null && !isNaN(parsed)) {
-            await column.set(projectId, key, parsed, undefined);
+            await column.update(key, { limit: parsed });
         } else {
-            await column.set(projectId, key, -1, undefined);      // TODO: -1 should be null (change column model to support it)
+            await column.update(key, { limit: null });
         }
     }
 

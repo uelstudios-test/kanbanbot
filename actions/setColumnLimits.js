@@ -1,6 +1,5 @@
 const axios = require("axios").default;
 const { project, column } = require("../database");
-const columns = require("../columns");
 const secrets = require("../secrets");
 
 module.exports = async (ctx, payload, value) => {
@@ -30,25 +29,16 @@ module.exports = async (ctx, payload, value) => {
 async function getColumnUiElements(projectId) {
     const dbColumns = await column.get(projectId);
 
-    const cKeys = Object.keys(columns);
     const elements = [];
-
-    for (let i = 0; i < cKeys.length; i++) {
-        const key = cKeys[i];
-        const column = columns[key];
-
-        const dbColumn = dbColumns.find(l => l.name === key);
-
-        const value = dbColumn ? dbColumn.limit : column.defaultLimit;
-
+    dbColumns.forEach(col => {
         elements.push({
             type: "text",
-            label: key,
-            name: key,
-            value: value < 0 ? "Kein Limit" : value,
+            label: col.name,
+            name: col.ghId,
+            value: col.limit === null ? "Kein Limit" : col.limit,
             optional: true
         });
-    }
+    });
 
     const dbproj = await project.get(projectId);
     elements.push({
@@ -63,12 +53,9 @@ async function getColumnUiElements(projectId) {
 }
 
 function getChannels() {
-    return axios.post("https://slack.com/api/channels.list",
+    return axios.post("https://slack.com/api/channels.list", {},
         {
-        },
-        {
-            headers:
-            {
+            headers: {
                 "Authorization": "Bearer " + secrets.slackToken
             }
         }

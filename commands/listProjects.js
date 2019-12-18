@@ -1,5 +1,4 @@
 const CommandError = require("../CommandError");
-const { isValidUrl } = require("../utils")
 const { project } = require("../database");
 const github = require("../github");
 
