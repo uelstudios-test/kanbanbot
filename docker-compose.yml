@@ -14,7 +14,7 @@ services:
             DB_PASS: letmein
             DB_HOST: database
             GH_ORG: uelstudios-test
-            DEFAULT_SLACK_CHANNEL: CRDN35U58
+            DEFAULT_SLACK_CHANNEL: CRDN35U58 #kanban-bot-test
     database:
         image: postgres:12-alpine
         volumes:

@@ -4,6 +4,8 @@ const secrets = require("../secrets");
 const db = require("../database");
 const message = require("../message");
 
+const NO_TITLE_CHANGE = process.env.NO_EMOJI ? true : false;
+
 const octokit = new Octokit({
     auth: secrets.githubToken
 })
@@ -58,11 +60,8 @@ module.exports = {
     }
 }
 
-// 🛑
-// ⚠️
-// ✔️
-
 function setColumnName(column, name) {
+    if (NO_TITLE_CHANGE) return;
     if (column.name === name) return;
     return octokit.projects.updateColumn({ column_id: column.id, name });
 }
