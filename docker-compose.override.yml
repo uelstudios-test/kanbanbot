@@ -3,5 +3,5 @@ version: "3.7"
 services:
     kanbanbot:
         volumes:
-            - "C:/Users/Paul/Documents/kanbanbot:/app"
+            - "./:/app"
             - "/app/node_modules"

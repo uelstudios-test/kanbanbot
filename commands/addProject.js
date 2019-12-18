@@ -13,6 +13,11 @@ module.exports = (ctx, args) => {
         throw new CommandError(`${args[0]} is not a valid url`);
     }
 
+    /**
+     * - Add project to database
+     * - Add all columns to the database (id, name, ...)
+     * - Send success / error message to slack client
+     */
     return github.projectFromUrl(args[0])
         .then(project => db.project.add(args[0], project.id)
             .then(() => db.project.getByUrl(args[0])

@@ -4,41 +4,38 @@ const secrets = require("../secrets");
 
 module.exports = async (ctx, payload, value) => {
     return getColumnUiElements(value)
-        .then(elements => axios.post("https://api.slack.com/api/dialog.open",
-            {
-                trigger_id: payload.trigger_id,
-                dialog: {
-                    callback_id: "set-column-limits",
-                    title: "Spaltenlimits",
-                    submit_label: "Setzen",
-                    notify_on_cancel: false,
-                    state: { projectId: value },
-                    elements
-                }
-            },
-            {
-                headers:
+        .then(elements =>
+            axios.post("https://api.slack.com/api/dialog.open",
                 {
-                    "Authorization": "Bearer " + secrets.slackToken
-                }
-            }
-        )
-            .then(() => ({ text: "" })));
+                    trigger_id: payload.trigger_id,
+                    dialog: {
+                        callback_id: "set-column-limits",
+                        title: "Spaltenlimits",
+                        submit_label: "Setzen",
+                        notify_on_cancel: false,
+                        state: { projectId: value },
+                        elements
+                    }
+                },
+                { headers: { "Authorization": "Bearer " + secrets.slackToken } })
+                .then(() => ({ text: "" })));
 }
 
+/**
+ * Returns limit fields and a slack channel dropdown menu.
+ * 
+ * @param {int} projectId 
+ */
 async function getColumnUiElements(projectId) {
     const dbColumns = await column.get(projectId);
 
-    const elements = [];
-    dbColumns.forEach(col => {
-        elements.push({
-            type: "text",
-            label: col.name,
-            name: col.ghId,
-            value: col.limit === null ? "Kein Limit" : col.limit,
-            optional: true
-        });
-    });
+    const elements = dbColumns.map(col => ({
+        type: "text",
+        label: col.name,
+        name: col.ghId,
+        value: col.limit === null ? "Kein Limit" : col.limit,
+        optional: true
+    }));
 
     const dbproj = await project.get(projectId);
     elements.push({
@@ -52,6 +49,9 @@ async function getColumnUiElements(projectId) {
     return elements;
 }
 
+/**
+ * Returns all channels for the linked slack domain
+ */
 function getChannels() {
     return axios.post("https://slack.com/api/channels.list", {},
         {

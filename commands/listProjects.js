@@ -9,18 +9,16 @@ module.exports = (ctx, args) => {
 
     return project
         .list()
-        .then(async (projects) =>
-            ({
-                attachments: await projectsToList(projects)
-            })
+        .then(async (projects) => projects.length > 0 ?
+            ({ attachments: await projectsToList(projects) }) :
+            { text: "Keine Projekte verfügbar" }
         );
 }
 
 /**
- * #1  url
- * #2  url
- * ...
- * #n  url
+ * Returns all projects as slack compatible message. 
+ * 
+ * @param {GitHub Projects} projects 
  */
 async function projectsToList(projects) {
     // Get all names

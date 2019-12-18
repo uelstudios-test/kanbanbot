@@ -3,6 +3,9 @@ const addProject = require("./addProject");
 const listProjects = require("./listProjects");
 const showStats = require("./showStats");
 
+/**
+ * The data of /command goes here.
+ */
 module.exports = async (ctx, body) => {
     const { text } = body;
     const { command, args } = parseCommandFromText(text);

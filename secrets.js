@@ -1,3 +1,8 @@
+/**
+ * Load Docker Swarm Secrets from disk.
+ * Env. variables are used as fallback.
+ */
+
 const fs = require("fs");
 
 module.exports = {

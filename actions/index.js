@@ -1,6 +1,9 @@
 const deleteProject = require("./deleteProject");
 const setColumnLimits = require("./setColumnLimits");
 
+/**
+ * The payload of interactible components (e.g. button) goes here.
+ */
 module.exports = (ctx, payload, action) => {
     switch (action.name) {
         case "delete-project":
