@@ -1,0 +1,7 @@
+# Mount the source code into the container for easy development.
+version: "3.7"
+services:
+    kanbanbot:
+        volumes:
+            - "C:/Users/Paul/Documents/kanbanbot:/app"
+            - "/app/node_modules"

@@ -1,0 +1,32 @@
+version: "3.7"
+services:
+    kanbanbot:
+        image: kanbanbot
+        build: ./
+        ports: 
+            - 80:80
+        secrets:
+            - github_personal_access_token
+            - slack_access_token
+        environment: 
+            DB_NAME: kanbanbot
+            DB_USER: kanbanbot
+            DB_PASS: letmein
+            DB_HOST: database
+            GH_ORG: uelstudios-test
+            DEFAULT_SLACK_CHANNEL: CRDN35U58
+    database:
+        image: postgres:12-alpine
+        volumes:
+            - database-data:/var/lib/postgresql/data
+        environment: 
+            POSTGRES_USER: kanbanbot
+            POSTGRES_PASSWORD: letmein
+            POSTGRES_DB: kanbanbot
+volumes:
+    database-data:
+secrets:
+    github_personal_access_token:
+        external: true
+    slack_access_token:
+        external: true
